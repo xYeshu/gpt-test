@@ -12,10 +12,14 @@ export default function ChatList() {
 
   const { isPending, error, data } = useQuery({
     queryKey: ["userChats"],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
+    queryFn: async () => {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
         credentials: "include",
-      }).then((res) => res.json()),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return Array.isArray(json) ? json : [];
+    },
   });
 
   return (
@@ -65,7 +69,9 @@ export default function ChatList() {
           ? "Loading..."
           : error
           ? "Something went wrong"
-          : data?.map((chat) => (
+          : Array.isArray(data) && data.length === 0
+          ? <span className="text-gray-500 text-sm">No chats yet</span>
+          : Array.isArray(data) && data.map((chat) => (
               <Link
                 key={chat._id}
                 className="chat-link"
