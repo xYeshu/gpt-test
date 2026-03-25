@@ -46,7 +46,7 @@ export default function ChatList() {
       <div className="flex flex-col gap-1">
         <h2 className="text-lg  text-purple-400">DASHBOARD</h2>
         <Link className="dashboard-link" to="/dashboard">
-          ➕ Create New Chat
+          Create New Chat
         </Link>
 
         <a
@@ -55,11 +55,11 @@ export default function ChatList() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          👤 About Creator
+          About Creator
         </a>
         <SignOutButton>
         <Link className="dashboard-link" to="/">
-          🚪 Log Out
+          Log Out
         </Link>
         </SignOutButton>
         <hr className="border-gray-700 my-3" />
@@ -80,7 +80,7 @@ export default function ChatList() {
                 className="chat-link"
                 to={`/dashboard/chats/${chat._id}`}
               >
-                💬 {chat.title}
+                {chat.title}
               </Link>
             ))}
       </div>
