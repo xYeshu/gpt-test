@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@clerk/clerk-react";
 import Upload from "../../upload/Upload";
 import ywlogoc from "/ywlogoc.svg";
 
@@ -24,15 +25,20 @@ export default function DashBoard() {
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const { getToken } = useAuth();
 
     const mutation = useMutation({
         mutationFn: async (text) => {
+            const token = await getToken();
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
                 method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({ text }),
             });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return await res.json();
         },
         onSuccess: (id) => {

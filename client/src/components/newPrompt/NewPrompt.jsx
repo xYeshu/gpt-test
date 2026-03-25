@@ -1,13 +1,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import "./newprompt.css"
-
 import attachment from "/attachment.png"
 import Upload from '../../upload/Upload';
 import { IKImage } from 'imagekitio-react';
 import model from '../../lib/gemini';
 import Markdown from "react-markdown"
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@clerk/clerk-react';
 
 export default function NewPrompt({data}) {
 
@@ -38,39 +38,37 @@ export default function NewPrompt({data}) {
 
 
     const queryClient = useQueryClient();
-
+    const { getToken } = useAuth();
 
     const mutation = useMutation({
-        mutationFn: ()=>{ return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
-                method:"PUT",
-                credentials:"include",
-                headers:{
-                    "Content-Type":"application/json"
+        mutationFn: async () => {
+            const token = await getToken();
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ question: question.length ? question : undefined,
-                    answer  , img: img.dbData?.filepath || undefined,
-
+                body: JSON.stringify({
+                    question: question.length ? question : undefined,
+                    answer,
+                    img: img.dbData?.filePath || undefined,
                 })
-            }).then((res)=>res.json())
-
+            });
+            return res.json();
         },
-     onSuccess: () => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(()=>{
-        formRef.current.reset();
-        setQuestion("")
-        setAnswer("")
-        setImg({ isLoading: false,
-            error: "",
-            dbData: {},
-            aiData: {},})
-      });
-     
-    },
-    onError: (err)=>{
-        console.log(err)
-    }
-      })
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["chat", data._id] }).then(() => {
+                formRef.current.reset();
+                setQuestion("");
+                setAnswer("");
+                setImg({ isLoading: false, error: "", dbData: {}, aiData: {} });
+            });
+        },
+        onError: (err) => {
+            console.log(err);
+        }
+    })
 
 
 

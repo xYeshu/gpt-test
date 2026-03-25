@@ -5,16 +5,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import Pricing from "../components/Pricing";
 import { motion, AnimatePresence } from "framer-motion";
-import { SignOutButton } from '@clerk/clerk-react'
+import { SignOutButton, useAuth } from '@clerk/clerk-react'
 
 export default function ChatList() {
   const [price, setPrice] = useState(true);
 
+  const { getToken } = useAuth();
+
   const { isPending, error, data } = useQuery({
     queryKey: ["userChats"],
     queryFn: async () => {
+      const token = await getToken();
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
-        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
