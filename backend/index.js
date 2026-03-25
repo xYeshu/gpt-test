@@ -11,16 +11,31 @@ const port = process.env.PORT || 8080;
 
 const app = express()
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://gpt-test-frontend.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL,
-      "http://localhost:5173",
-      "http://localhost:5174",
-    ],
+    origin: (origin, callback) => {
+      // allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 app.use(clerkMiddleware())
 app.use(express.json())
