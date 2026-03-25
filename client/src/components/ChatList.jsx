@@ -99,8 +99,8 @@ export default function ChatList() {
 
         {/* Upgrade Section */}
         <div className="flex flex-col ml-2">
-          <button
-            className="upgrade-btn cursor-pointer flex flex-col rounded-lg text-white shadow-md hover:shadow-lg transition-all duration-300"
+         <button
+            className="items-start upgrade-btn cursor-pointer flex flex-col rounded-lg text-white shadow-md hover:shadow-lg transition-all duration-300"
             onClick={() => setPrice(!price)}
           >
             Upgrade to Pro
