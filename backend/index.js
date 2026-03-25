@@ -72,6 +72,11 @@ app.get('/auth', function (req, res) {
   res.send(result);
 });
 
+// ─── Health check ────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', service: 'DarkGPT API' });
+});
+
 // ─── Routes ──────────────────────────────────────────────────────────────────
 
 app.post('/api/chats', requireAuth(), async (req, res) => {
